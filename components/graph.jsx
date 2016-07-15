@@ -4,6 +4,8 @@ const Vertex = require('./vertex');
 const Plane = require('./plane');
 const Edge = require('./edge');
 
+const VertexActions = require('../actions/vertex_actions');
+
 function makeRandomVertices(num) {
   const vertices = [];
   const angles = [];
@@ -25,7 +27,7 @@ function pairIndex(p, q, n) {
   return (p*(2*n - p - 1)/2) + q - p;
 }
 
-// basically solving a1*x + b1 = a2*x + b2
+// basically solving for x: a1*x + b1 = a2*x + b2
 // l1 = [a1, b1]
 function intersection(l1, l2) {
   return (l2[1] - l1[1]) / (l1[0] - l2[0]);
@@ -82,12 +84,17 @@ const Graph = React.createClass({
     return {vertices: makeRandomVertices(numberOfVertices)};
   },
 
+  componentDidMount() {
+    VertexActions.storeVerticesAndPairs(this.state.vertices, this.pairs);
+  },
 
   render: function() {
-    return (<Plane height="600" width="900">
-              <g>{pairsOfVertices(this.state.vertices).map((pair, idx) => <Edge indices={pair.map(vertex => vertex.index)} key={idx} x1={pair[0].x} y1={pair[0].y} x2={pair[1].x} y2={pair[1].y} />)}</g>
-              <g>{this.state.vertices.map(vertex => <Vertex key={vertex.index} index={vertex.index} cx={vertex.x} cy={vertex.y} />)}</g>
-            </Plane>
+    this.pairs = pairsOfVertices(this.state.vertices);
+    return (
+      <Plane height="600" width="900">
+        <g>{this.pairs.map((pair, idx) => <Edge indices={pair.map(vertex => vertex.index)} idx={idx} key={idx} x1={pair[0].x} y1={pair[0].y} x2={pair[1].x} y2={pair[1].y} />)}</g>
+        <g>{this.state.vertices.map(vertex => <Vertex key={vertex.index} index={vertex.index} cx={vertex.x} cy={vertex.y} />)}</g>
+      </Plane>
     );
   }
 });

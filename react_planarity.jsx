@@ -8,6 +8,6 @@ const Graph =require('./components/graph');
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  ReactDOM.render(<Graph level={20} />,
+  ReactDOM.render(<Graph level={3} />,
     document.getElementById('main'));
 });
