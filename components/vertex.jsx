@@ -1,4 +1,5 @@
 const React = require('react');
+const VertexActions = require('../actions/vertex_actions');
 
 const Vertex = React.createClass({
   getInitialState() {
@@ -54,6 +55,11 @@ const Vertex = React.createClass({
       newY = 0;
     }
     this.setState({ pos: {x: newX, y: newY} });
+    VertexActions.updateVertex({
+      index: this.props.index,
+      x: this.state.pos.x,
+      y: this.state.pos.y
+    });
     e.stopPropagation();
     e.preventDefault();
   },
