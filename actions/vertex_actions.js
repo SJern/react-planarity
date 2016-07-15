@@ -7,10 +7,9 @@ const VertexActions = {
       vertex: vertex
     });
   },
-  storeVerticesAndPairs(vertices, pairs) {
+  storePairs(pairs) {
     AppDispatcher.dispatch({
-      actionType: "STORE_VERTICES_AND_PAIRS",
-      vertices: vertices,
+      actionType: "STORE_PAIRS",
       pairs: pairs
     });
   }

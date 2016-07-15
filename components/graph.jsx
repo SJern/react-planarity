@@ -85,7 +85,9 @@ const Graph = React.createClass({
   },
 
   componentDidMount() {
-    VertexActions.storeVerticesAndPairs(this.state.vertices, this.pairs);
+    VertexActions.storePairs(this.pairs);
+    const notDone = $('.intersected').length;
+    $("#count p").replaceWith(`<p>${notDone} line crossing(s) detected.${notDone ? "" : " Good job!"}</p>`);
   },
 
   render: function() {

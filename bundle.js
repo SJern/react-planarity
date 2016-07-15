@@ -21191,7 +21191,9 @@
 	    return { vertices: makeRandomVertices(numberOfVertices) };
 	  },
 	  componentDidMount: function componentDidMount() {
-	    VertexActions.storeVerticesAndPairs(this.state.vertices, this.pairs);
+	    VertexActions.storePairs(this.pairs);
+	    var notDone = $('.intersected').length;
+	    $("#count p").replaceWith('<p>' + notDone + ' line crossing(s) detected.' + (notDone ? "" : " Good job!") + '</p>');
 	  },
 	
 	
@@ -21313,10 +21315,9 @@
 	      vertex: vertex
 	    });
 	  },
-	  storeVerticesAndPairs: function storeVerticesAndPairs(vertices, pairs) {
+	  storePairs: function storePairs(pairs) {
 	    AppDispatcher.dispatch({
-	      actionType: "STORE_VERTICES_AND_PAIRS",
-	      vertices: vertices,
+	      actionType: "STORE_PAIRS",
 	      pairs: pairs
 	    });
 	  }
@@ -21680,13 +21681,17 @@
 	    return false;
 	  }
 	
-	  var s1_x, s1_y, s2_x, s2_y;
+	  var s1_x = void 0,
+	      s1_y = void 0,
+	      s2_x = void 0,
+	      s2_y = void 0;
 	  s1_x = p1_x - p0_x;
 	  s1_y = p1_y - p0_y;
 	  s2_x = p3_x - p2_x;
 	  s2_y = p3_y - p2_y;
 	
-	  var s, t;
+	  var s = void 0,
+	      t = void 0;
 	  s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y);
 	  t = (s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y);
 	
@@ -21731,7 +21736,8 @@
 	    } else if (!intersected && this.state.intersected) {
 	      this.setState({ intersected: intersected });
 	    }
-	    $("#count").replaceWith('<h2>' + $('.intersected').length + '</h2>');
+	    var notDone = $('.intersected').length;
+	    $("#count p").replaceWith('<p>' + notDone + ' line crossing(s) detected.' + (notDone ? "" : " Good job!") + '</p>');
 	  },
 	
 	
@@ -21759,7 +21765,6 @@
 	var VertexStore = new Store(AppDispatcher);
 	
 	var _vertex = void 0,
-	    _vertices = void 0,
 	    _pairs = void 0;
 	
 	VertexStore.vertex = function () {
@@ -21772,10 +21777,9 @@
 	
 	function updateVertex(vertex) {
 	  _vertex = vertex;
-	  _vertices[vertex.index] = vertex;
 	  for (var i = 0, len = _pairs.length; i < len; i++) {
 	    for (var j = 0; j < 2; j++) {
-	      if (_pairs[i][j].index === vertex) {
+	      if (_pairs[i][j].index === vertex.index) {
 	        _pairs[i][j] = vertex;
 	      }
 	    }
@@ -21783,8 +21787,7 @@
 	  VertexStore.__emitChange();
 	}
 	
-	function storeVerticesAndPairs(vertices, pairs) {
-	  _vertices = vertices;
+	function storePairs(pairs) {
 	  _pairs = pairs;
 	}
 	
@@ -21793,8 +21796,8 @@
 	    case "UPDATE_VERTEX":
 	      updateVertex(payload.vertex);
 	      break;
-	    case "STORE_VERTICES_AND_PAIRS":
-	      storeVerticesAndPairs(payload.vertices, payload.pairs);
+	    case "STORE_PAIRS":
+	      storePairs(payload.pairs);
 	  }
 	};
 	
