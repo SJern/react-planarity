@@ -52,7 +52,7 @@
 	var Graph = __webpack_require__(172);
 	
 	document.addEventListener("DOMContentLoaded", function () {
-	  ReactDOM.render(React.createElement(Graph, { level: 3 }), document.getElementById('main'));
+	  ReactDOM.render(React.createElement(Graph, { level: 10 }), document.getElementById('main'));
 	});
 
 /***/ },
@@ -21140,8 +21140,7 @@
 	  return slopes;
 	}
 	
-	function pairsOfVertices(that) {
-	  var vertices = that.state.vertices;
+	function verticesAndPairs(vertices, numberOfVerticesToRemove) {
 	  var k = 4;
 	  var numberOfVertices = vertices.length;
 	  while (true) {
@@ -21167,6 +21166,7 @@
 	    otherLines.sort(function (l1, l2) {
 	      return intersection(lines[i], lines[l1]) - intersection(lines[i], lines[l2]);
 	    });
+	
 	    for (var _j = 0; _j < n - 2; _j++) {
 	      var u = pairIndex(i, otherLines[_j], n) - 1,
 	          v = pairIndex(i, otherLines[_j + 1], n) - 1;
@@ -21184,10 +21184,11 @@
 	  for (var i = 0; i < n; i++) {
 	    _loop(i);
 	  }
+	
 	  var unwantedsLibrary = {};
 	  var added = 0;
 	  for (var vertex in degreeSequence) {
-	    if (added === that.state.numberOfVerticesToRemove) break;
+	    if (added === numberOfVerticesToRemove) break;
 	    if (degreeSequence.hasOwnProperty(vertex)) {
 	      if (degreeSequence[vertex] === 2) {
 	        unwantedsLibrary[vertex] = true;
@@ -21200,13 +21201,11 @@
 	      return unwantedsLibrary[vertex.index];
 	    });
 	  });
-	  console.log("before");
-	  var desiredVertices = that.state.vertices.filter(function (vertex, i) {
+	  var desiredVertices = vertices.filter(function (vertex, i) {
 	    return !unwantedsLibrary[i + 1];
 	  });
-	  console.log("hohoafter");
 	
-	  return pairs;
+	  return [pairs, desiredVertices];
 	}
 	
 	var Graph = React.createClass({
@@ -21218,29 +21217,31 @@
 	      if (k * (k - 1) >= 2 * desiredNumber) break;
 	      k++;
 	    }
-	    var n = k;
-	    var numberOfVertices = n * (n - 1) / 2;
+	    var n = k,
+	        numberOfVerticesForN = n * (n - 1) / 2,
+	        vertices = makeRandomVertices(numberOfVerticesForN),
+	        numberOfVerticesToRemove = numberOfVerticesForN - desiredNumber,
+	        desiredVerticesAndPairs = verticesAndPairs(vertices, numberOfVerticesToRemove);
 	    return {
-	      vertices: makeRandomVertices(numberOfVertices),
-	      numberOfVerticesToRemove: numberOfVertices - desiredNumber
+	      vertices: desiredVerticesAndPairs[1],
+	      pairs: desiredVerticesAndPairs[0]
 	    };
 	  },
 	  componentDidMount: function componentDidMount() {
-	    VertexActions.storePairs(this.pairs);
+	    VertexActions.storePairs(this.state.pairs);
 	    var notDone = $('.intersected').length;
 	    $("#count p").replaceWith('<p>' + notDone + ' line crossing(s) detected.' + (notDone ? "" : " Good job!") + '</p>');
 	  },
 	
 	
 	  render: function render() {
-	    this.pairs = pairsOfVertices(this);
 	    return React.createElement(
 	      Plane,
 	      { height: '600', width: '900' },
 	      React.createElement(
 	        'g',
 	        null,
-	        this.pairs.map(function (pair, idx) {
+	        this.state.pairs.map(function (pair, idx) {
 	          return React.createElement(Edge, { indices: pair.map(function (vertex) {
 	              return vertex.index;
 	            }), idx: idx, key: idx, x1: pair[0].x, y1: pair[0].y, x2: pair[1].x, y2: pair[1].y });

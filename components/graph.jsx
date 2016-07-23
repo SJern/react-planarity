@@ -45,8 +45,7 @@ function unparalleledSlopes(n) {
   return slopes;
 }
 
-function pairsOfVertices(that) {
-  const vertices = that.state.vertices;
+function verticesAndPairs(vertices, numberOfVerticesToRemove) {
   let k = 4;
   const numberOfVertices = vertices.length;
   while (true) {
@@ -69,6 +68,7 @@ function pairsOfVertices(that) {
     otherLines.sort((l1, l2) => {
       return intersection(lines[i], lines[l1]) - intersection(lines[i], lines[l2]);
     });
+
     for (let j = 0; j < n - 2; j++) {
       let u = pairIndex(i, otherLines[j], n) - 1,
           v = pairIndex(i, otherLines[j + 1], n) - 1;
@@ -78,10 +78,11 @@ function pairsOfVertices(that) {
       pairs.push(pair);
     }
   }
+
   const unwantedsLibrary = {};
   let added = 0;
   for (let vertex in degreeSequence) {
-    if (added === that.state.numberOfVerticesToRemove) break;
+    if (added === numberOfVerticesToRemove) break;
     if( degreeSequence.hasOwnProperty(vertex) ) {
       if (degreeSequence[vertex] === 2) {
         unwantedsLibrary[vertex] = true;
@@ -92,13 +93,11 @@ function pairsOfVertices(that) {
   pairs = pairs.filter(pair => {
     return !pair.some(vertex => unwantedsLibrary[vertex.index]);
   });
-  console.log("before");
-  const desiredVertices = that.state.vertices.filter((vertex, i) => {
+  const desiredVertices = vertices.filter((vertex, i) => {
     return !unwantedsLibrary[i + 1];
   });
-  console.log("hohoafter");
 
-  return pairs;
+  return [pairs, desiredVertices];
 }
 
 const Graph = React.createClass({
@@ -109,25 +108,27 @@ const Graph = React.createClass({
       if (k * (k - 1) >= 2 * desiredNumber) break;
       k++;
     }
-    const n = k;
-    const numberOfVertices = n*(n - 1)/2;
+    const n = k,
+          numberOfVerticesForN = n*(n - 1)/2,
+          vertices = makeRandomVertices(numberOfVerticesForN),
+          numberOfVerticesToRemove = (numberOfVerticesForN - desiredNumber),
+          desiredVerticesAndPairs = verticesAndPairs(vertices, numberOfVerticesToRemove);
     return {
-      vertices: makeRandomVertices(numberOfVertices),
-      numberOfVerticesToRemove: (numberOfVertices - desiredNumber)
+      vertices: desiredVerticesAndPairs[1],
+      pairs: desiredVerticesAndPairs[0]
     };
   },
 
   componentDidMount() {
-    VertexActions.storePairs(this.pairs);
+    VertexActions.storePairs(this.state.pairs);
     const notDone = $('.intersected').length;
     $("#count p").replaceWith(`<p>${notDone} line crossing(s) detected.${notDone ? "" : " Good job!"}</p>`);
   },
 
   render: function() {
-    this.pairs = pairsOfVertices(this);
     return (
       <Plane height="600" width="900">
-        <g>{this.pairs.map((pair, idx) => <Edge indices={pair.map(vertex => vertex.index)} idx={idx} key={idx} x1={pair[0].x} y1={pair[0].y} x2={pair[1].x} y2={pair[1].y} />)}</g>
+        <g>{this.state.pairs.map((pair, idx) => <Edge indices={pair.map(vertex => vertex.index)} idx={idx} key={idx} x1={pair[0].x} y1={pair[0].y} x2={pair[1].x} y2={pair[1].y} />)}</g>
         <g>{this.state.vertices.map(vertex => <Vertex key={vertex.index} index={vertex.index} cx={vertex.x} cy={vertex.y} />)}</g>
       </Plane>
     );
