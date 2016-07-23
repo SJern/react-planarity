@@ -21140,15 +21140,18 @@
 	  return slopes;
 	}
 	
-	function pairsOfVertices(vertices) {
+	function pairsOfVertices(that) {
+	  var vertices = that.state.vertices;
 	  var k = 4;
 	  var numberOfVertices = vertices.length;
 	  while (true) {
 	    if (k * (k - 1) === 2 * numberOfVertices) break;
 	    k++;
 	  }
-	  var pairs = [],
-	      n = k,
+	
+	  var pairs = [];
+	  var n = k,
+	      degreeSequence = {},
 	      lines = unparalleledSlopes(n).map(function (slope) {
 	    return [slope, Math.random()];
 	  });
@@ -21164,10 +21167,11 @@
 	    otherLines.sort(function (l1, l2) {
 	      return intersection(lines[i], lines[l1]) - intersection(lines[i], lines[l2]);
 	    });
-	
 	    for (var _j = 0; _j < n - 2; _j++) {
 	      var u = pairIndex(i, otherLines[_j], n) - 1,
 	          v = pairIndex(i, otherLines[_j + 1], n) - 1;
+	      degreeSequence[u + 1] = (degreeSequence[u + 1] || 0) + 1;
+	      degreeSequence[v + 1] = (degreeSequence[v + 1] || 0) + 1;
 	      var pair = [u, v].sort(function (a, b) {
 	        return a - b;
 	      }).map(function (pairIdx) {
@@ -21180,15 +21184,46 @@
 	  for (var i = 0; i < n; i++) {
 	    _loop(i);
 	  }
+	  var unwantedsLibrary = {};
+	  var added = 0;
+	  for (var vertex in degreeSequence) {
+	    if (added === that.state.numberOfVerticesToRemove) break;
+	    if (degreeSequence.hasOwnProperty(vertex)) {
+	      if (degreeSequence[vertex] === 2) {
+	        unwantedsLibrary[vertex] = true;
+	        added += 1;
+	      }
+	    }
+	  }
+	  pairs = pairs.filter(function (pair) {
+	    return !pair.some(function (vertex) {
+	      return unwantedsLibrary[vertex.index];
+	    });
+	  });
+	  console.log("before");
+	  var desiredVertices = that.state.vertices.filter(function (vertex, i) {
+	    return !unwantedsLibrary[i + 1];
+	  });
+	  console.log("hohoafter");
+	
 	  return pairs;
 	}
 	
 	var Graph = React.createClass({
 	  displayName: 'Graph',
 	  getInitialState: function getInitialState() {
-	    var n = this.props.level + 3;
+	    var desiredNumber = this.props.level + 5;
+	    var k = 4;
+	    while (true) {
+	      if (k * (k - 1) >= 2 * desiredNumber) break;
+	      k++;
+	    }
+	    var n = k;
 	    var numberOfVertices = n * (n - 1) / 2;
-	    return { vertices: makeRandomVertices(numberOfVertices) };
+	    return {
+	      vertices: makeRandomVertices(numberOfVertices),
+	      numberOfVerticesToRemove: numberOfVertices - desiredNumber
+	    };
 	  },
 	  componentDidMount: function componentDidMount() {
 	    VertexActions.storePairs(this.pairs);
@@ -21198,7 +21233,7 @@
 	
 	
 	  render: function render() {
-	    this.pairs = pairsOfVertices(this.state.vertices);
+	    this.pairs = pairsOfVertices(this);
 	    return React.createElement(
 	      Plane,
 	      { height: '600', width: '900' },

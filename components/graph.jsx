@@ -45,14 +45,17 @@ function unparalleledSlopes(n) {
   return slopes;
 }
 
-function pairsOfVertices(vertices) {
+function pairsOfVertices(that) {
+  const vertices = that.state.vertices;
   let k = 4;
   const numberOfVertices = vertices.length;
   while (true) {
     if (k * (k - 1) === 2 * numberOfVertices) break;
     k++;
   }
-  const pairs = [], n = k,
+
+  let pairs = [];
+  const n = k, degreeSequence = {},
         lines = unparalleledSlopes(n).map(slope => [slope, Math.random()]);
 
   for (let i = 0; i < n; i++) {
@@ -66,22 +69,52 @@ function pairsOfVertices(vertices) {
     otherLines.sort((l1, l2) => {
       return intersection(lines[i], lines[l1]) - intersection(lines[i], lines[l2]);
     });
-
     for (let j = 0; j < n - 2; j++) {
       let u = pairIndex(i, otherLines[j], n) - 1,
           v = pairIndex(i, otherLines[j + 1], n) - 1;
+      degreeSequence[u + 1] = (degreeSequence[u + 1] || 0) + 1;
+      degreeSequence[v + 1] = (degreeSequence[v + 1] || 0) + 1;
       let pair = [u, v].sort((a, b) => a - b).map(pairIdx => vertices[pairIdx]);
       pairs.push(pair);
     }
   }
+  const unwantedsLibrary = {};
+  let added = 0;
+  for (let vertex in degreeSequence) {
+    if (added === that.state.numberOfVerticesToRemove) break;
+    if( degreeSequence.hasOwnProperty(vertex) ) {
+      if (degreeSequence[vertex] === 2) {
+        unwantedsLibrary[vertex] = true;
+        added += 1;
+      }
+    }
+  }
+  pairs = pairs.filter(pair => {
+    return !pair.some(vertex => unwantedsLibrary[vertex.index]);
+  });
+  console.log("before");
+  const desiredVertices = that.state.vertices.filter((vertex, i) => {
+    return !unwantedsLibrary[i + 1];
+  });
+  console.log("hohoafter");
+
   return pairs;
 }
 
 const Graph = React.createClass({
   getInitialState() {
-    const n = this.props.level + 3;
+    const desiredNumber = this.props.level + 5;
+    let k = 4;
+    while (true) {
+      if (k * (k - 1) >= 2 * desiredNumber) break;
+      k++;
+    }
+    const n = k;
     const numberOfVertices = n*(n - 1)/2;
-    return {vertices: makeRandomVertices(numberOfVertices)};
+    return {
+      vertices: makeRandomVertices(numberOfVertices),
+      numberOfVerticesToRemove: (numberOfVertices - desiredNumber)
+    };
   },
 
   componentDidMount() {
@@ -91,7 +124,7 @@ const Graph = React.createClass({
   },
 
   render: function() {
-    this.pairs = pairsOfVertices(this.state.vertices);
+    this.pairs = pairsOfVertices(this);
     return (
       <Plane height="600" width="900">
         <g>{this.pairs.map((pair, idx) => <Edge indices={pair.map(vertex => vertex.index)} idx={idx} key={idx} x1={pair[0].x} y1={pair[0].y} x2={pair[1].x} y2={pair[1].y} />)}</g>
