@@ -59,7 +59,7 @@ const App = React.createClass({
                 <input type="number" placeholder={this.state.level} className="form-control input-sm" id="input" min="1" max="6000"/>
               </form>
             </div>
-            <Graph key={this.state.level} level={this.state.level} />
+            <Graph channel="game" active={this.state.game} level={this.state.level} key={this.state.level} />
           </div>
         </Element>
 
@@ -68,7 +68,7 @@ const App = React.createClass({
         </Element>
 
         <Element name="solvable" className="element">
-          <Fake channel="solvable" active={this.state.solvable}/>
+          <Graph channel="solvable" active={this.state.solvable} level={50} />
         </Element>
       </div>
     );

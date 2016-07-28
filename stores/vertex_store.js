@@ -3,30 +3,44 @@ const Store = require('flux/utils').Store;
 
 const VertexStore = new Store(AppDispatcher);
 
-let _vertex, _pairs;
+let _vertex, _pairs, _unsolvable, _solvable;
 
 VertexStore.vertex = function() {
   return Object.assign({}, _vertex);
 };
 
-VertexStore.pairs = function() {
-  return _pairs;
+VertexStore.pairs = function(channel) {
+  if (channel === "game") {
+    return _pairs;
+  } else if (channel === "solvable") {
+    return _solvable;
+  }
 };
 
 function updateVertex(vertex) {
   _vertex = vertex;
-  for (let i = 0, len = _pairs.length; i < len; i++) {
+  let pairs;
+  if (vertex.channel === "game") {
+    pairs = _pairs;
+  } else if (vertex.channel === "solvable") {
+    pairs = _solvable;
+  }
+  for (let i = 0, len = pairs.length; i < len; i++) {
     for (let j = 0; j < 2; j++) {
-      if (_pairs[i][j].index === vertex.index) {
-        _pairs[i][j] = vertex;
+      if (pairs[i][j].index === vertex.index) {
+        pairs[i][j] = vertex;
       }
     }
   }
   VertexStore.__emitChange();
 }
 
-function storePairs(pairs) {
-  _pairs = pairs;
+function storePairs(channel, pairs) {
+  if (channel === "game") {
+    _pairs = pairs;
+  } else if (channel === "solvable") {
+    _solvable = pairs;
+  }
 }
 
 VertexStore.__onDispatch = function(payload) {
@@ -35,7 +49,7 @@ VertexStore.__onDispatch = function(payload) {
       updateVertex(payload.vertex);
       break;
     case "STORE_PAIRS":
-      storePairs(payload.pairs);
+      storePairs(payload.channel, payload.pairs);
   }
 };
 

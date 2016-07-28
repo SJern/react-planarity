@@ -120,16 +120,16 @@ const Graph = React.createClass({
   },
 
   componentDidMount() {
-    VertexActions.storePairs(this.state.pairs);
-    const notDone = $('.intersected').length;
-    $("#count p").replaceWith(`<p>${notDone} line crossing(s) detected.${notDone ? "" : " Good job!"}</p>`);
+    VertexActions.storePairs(this.props.channel, this.state.pairs);
+    const notDone = $('#game .intersected').length;
+    $("#count p").replaceWith(`<p>${notDone} line crossing(s) detected.${notDone ? "" : "<br/>Good job!"}</p>`);
   },
 
   render: function() {
     return (
       <Plane height="600" width="900">
-        <g>{this.state.pairs.map((pair, idx) => <Edge indices={pair.map(vertex => vertex.index)} idx={idx} key={idx} x1={pair[0].x} y1={pair[0].y} x2={pair[1].x} y2={pair[1].y} />)}</g>
-        <g>{this.state.vertices.map(vertex => <Vertex key={vertex.index} index={vertex.index} cx={vertex.x} cy={vertex.y} />)}</g>
+        <g>{this.state.pairs.map((pair, idx) => <Edge active={this.props.active} channel={this.props.channel} indices={pair.map(vertex => vertex.index)} idx={idx} key={idx} x1={pair[0].x} y1={pair[0].y} x2={pair[1].x} y2={pair[1].y} />)}</g>
+        <g>{this.state.vertices.map(vertex => <Vertex channel={this.props.channel} key={vertex.index} index={vertex.index} cx={vertex.x} cy={vertex.y} />)}</g>
       </Plane>
     );
   }

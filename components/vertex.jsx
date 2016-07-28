@@ -56,6 +56,7 @@ const Vertex = React.createClass({
     }
     this.setState({ pos: {x: newX, y: newY} });
     VertexActions.updateVertex({
+      channel: this.props.channel,
       index: this.props.index,
       x: this.state.pos.x,
       y: this.state.pos.y

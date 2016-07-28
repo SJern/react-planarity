@@ -7,9 +7,10 @@ const VertexActions = {
       vertex: vertex
     });
   },
-  storePairs(pairs) {
+  storePairs(channel, pairs) {
     AppDispatcher.dispatch({
       actionType: "STORE_PAIRS",
+      channel: channel,
       pairs: pairs
     });
   }

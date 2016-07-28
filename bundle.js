@@ -144,7 +144,7 @@
 	              React.createElement('input', { type: 'number', placeholder: this.state.level, className: 'form-control input-sm', id: 'input', min: '1', max: '6000' })
 	            )
 	          ),
-	          React.createElement(Graph, { key: this.state.level, level: this.state.level })
+	          React.createElement(Graph, { channel: 'game', active: this.state.game, level: this.state.level, key: this.state.level })
 	        )
 	      ),
 	      React.createElement(
@@ -155,7 +155,7 @@
 	      React.createElement(
 	        Element,
 	        { name: 'solvable', className: 'element' },
-	        React.createElement(Fake, { channel: 'solvable', active: this.state.solvable })
+	        React.createElement(Graph, { channel: 'solvable', active: this.state.solvable, level: 50 })
 	      )
 	    );
 	  }
@@ -21338,13 +21338,15 @@
 	    };
 	  },
 	  componentDidMount: function componentDidMount() {
-	    VertexActions.storePairs(this.state.pairs);
-	    var notDone = $('.intersected').length;
-	    $("#count p").replaceWith('<p>' + notDone + ' line crossing(s) detected.' + (notDone ? "" : " Good job!") + '</p>');
+	    VertexActions.storePairs(this.props.channel, this.state.pairs);
+	    var notDone = $('#game .intersected').length;
+	    $("#count p").replaceWith('<p>' + notDone + ' line crossing(s) detected.' + (notDone ? "" : "<br/>Good job!") + '</p>');
 	  },
 	
 	
 	  render: function render() {
+	    var _this = this;
+	
 	    return React.createElement(
 	      Plane,
 	      { height: '600', width: '900' },
@@ -21352,7 +21354,7 @@
 	        'g',
 	        null,
 	        this.state.pairs.map(function (pair, idx) {
-	          return React.createElement(Edge, { indices: pair.map(function (vertex) {
+	          return React.createElement(Edge, { active: _this.props.active, channel: _this.props.channel, indices: pair.map(function (vertex) {
 	              return vertex.index;
 	            }), idx: idx, key: idx, x1: pair[0].x, y1: pair[0].y, x2: pair[1].x, y2: pair[1].y });
 	        })
@@ -21361,7 +21363,7 @@
 	        'g',
 	        null,
 	        this.state.vertices.map(function (vertex) {
-	          return React.createElement(Vertex, { key: vertex.index, index: vertex.index, cx: vertex.x, cy: vertex.y });
+	          return React.createElement(Vertex, { channel: _this.props.channel, key: vertex.index, index: vertex.index, cx: vertex.x, cy: vertex.y });
 	        })
 	      )
 	    );
@@ -21432,6 +21434,7 @@
 	    }
 	    this.setState({ pos: { x: newX, y: newY } });
 	    VertexActions.updateVertex({
+	      channel: this.props.channel,
 	      index: this.props.index,
 	      x: this.state.pos.x,
 	      y: this.state.pos.y
@@ -21461,9 +21464,10 @@
 	      vertex: vertex
 	    });
 	  },
-	  storePairs: function storePairs(pairs) {
+	  storePairs: function storePairs(channel, pairs) {
 	    AppDispatcher.dispatch({
 	      actionType: "STORE_PAIRS",
+	      channel: channel,
 	      pairs: pairs
 	    });
 	  }
@@ -21856,7 +21860,21 @@
 	    };
 	  },
 	  componentDidMount: function componentDidMount() {
-	    this.vertexListener = VertexStore.addListener(this.handleChange);
+	    if (this.props.channel === "game") {
+	      this.vertexListener = VertexStore.addListener(this.handleChange);
+	    }
+	  },
+	  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+	    if (nextProps.active) {
+	      if (!this.vertexListener) {
+	        this.vertexListener = VertexStore.addListener(this.handleChange);
+	      }
+	    } else {
+	      if (this.vertexListener) {
+	        this.vertexListener.remove();
+	        this.vertexListener = undefined;
+	      }
+	    }
 	  },
 	  componentWillUnmount: function componentWillUnmount() {
 	    this.vertexListener.remove();
@@ -21871,7 +21889,7 @@
 	    } else if (idx === 1) {
 	      this.setState({ x2: vertex.x, y2: vertex.y });
 	    }
-	    var intersected = VertexStore.pairs().some(function (pair, i) {
+	    var intersected = VertexStore.pairs(this.props.channel).some(function (pair, i) {
 	      if (i === _this.props.idx) {
 	        return false;
 	      }
@@ -21882,8 +21900,8 @@
 	    } else if (!intersected && this.state.intersected) {
 	      this.setState({ intersected: intersected });
 	    }
-	    var notDone = $('.intersected').length;
-	    $("#count p").replaceWith('<p>' + notDone + ' line crossing(s) detected.' + (notDone ? "" : " Good job!") + '</p>');
+	    var notDone = $('#game .intersected').length;
+	    $("#count p").replaceWith('<p>' + notDone + ' line crossing(s) detected.' + (notDone ? "" : "<br/>Good job!") + '</p>');
 	  },
 	
 	
@@ -21911,30 +21929,46 @@
 	var VertexStore = new Store(AppDispatcher);
 	
 	var _vertex = void 0,
-	    _pairs = void 0;
+	    _pairs = void 0,
+	    _unsolvable = void 0,
+	    _solvable = void 0;
 	
 	VertexStore.vertex = function () {
 	  return Object.assign({}, _vertex);
 	};
 	
-	VertexStore.pairs = function () {
-	  return _pairs;
+	VertexStore.pairs = function (channel) {
+	  if (channel === "game") {
+	    return _pairs;
+	  } else if (channel === "solvable") {
+	    return _solvable;
+	  }
 	};
 	
 	function updateVertex(vertex) {
 	  _vertex = vertex;
-	  for (var i = 0, len = _pairs.length; i < len; i++) {
+	  var pairs = void 0;
+	  if (vertex.channel === "game") {
+	    pairs = _pairs;
+	  } else if (vertex.channel === "solvable") {
+	    pairs = _solvable;
+	  }
+	  for (var i = 0, len = pairs.length; i < len; i++) {
 	    for (var j = 0; j < 2; j++) {
-	      if (_pairs[i][j].index === vertex.index) {
-	        _pairs[i][j] = vertex;
+	      if (pairs[i][j].index === vertex.index) {
+	        pairs[i][j] = vertex;
 	      }
 	    }
 	  }
 	  VertexStore.__emitChange();
 	}
 	
-	function storePairs(pairs) {
-	  _pairs = pairs;
+	function storePairs(channel, pairs) {
+	  if (channel === "game") {
+	    _pairs = pairs;
+	  } else if (channel === "solvable") {
+	    _solvable = pairs;
+	  }
 	}
 	
 	VertexStore.__onDispatch = function (payload) {
@@ -21943,7 +21977,7 @@
 	      updateVertex(payload.vertex);
 	      break;
 	    case "STORE_PAIRS":
-	      storePairs(payload.pairs);
+	      storePairs(payload.channel, payload.pairs);
 	  }
 	};
 	

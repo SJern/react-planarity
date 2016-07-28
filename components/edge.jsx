@@ -32,7 +32,21 @@ const Edge = React.createClass({
     };
   },
   componentDidMount() {
-    this.vertexListener = VertexStore.addListener(this.handleChange);
+    if (this.props.channel === "game") {
+      this.vertexListener = VertexStore.addListener(this.handleChange);
+    }
+  },
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.active) {
+      if (!this.vertexListener) {
+        this.vertexListener = VertexStore.addListener(this.handleChange);
+      }
+    } else {
+      if (this.vertexListener) {
+        this.vertexListener.remove();
+        this.vertexListener = undefined;
+      }
+    }
   },
   componentWillUnmount() {
     this.vertexListener.remove();
@@ -45,7 +59,7 @@ const Edge = React.createClass({
     } else if (idx === 1) {
       this.setState({ x2: vertex.x, y2: vertex.y });
     }
-    const intersected = VertexStore.pairs().some((pair, i) => {
+    const intersected = VertexStore.pairs(this.props.channel).some((pair, i) => {
       if (i === this.props.idx) {
         return false;
       }
@@ -56,8 +70,8 @@ const Edge = React.createClass({
     } else if (!intersected && this.state.intersected) {
       this.setState({intersected: intersected});
     }
-    const notDone = $('.intersected').length;
-    $("#count p").replaceWith(`<p>${notDone} line crossing(s) detected.${notDone ? "" : " Good job!"}</p>`);
+    const notDone = $('#game .intersected').length;
+    $("#count p").replaceWith(`<p>${notDone} line crossing(s) detected.${notDone ? "" : "<br/>Good job!"}</p>`);
   },
 
   render: function() {
