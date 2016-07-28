@@ -54,8 +54,6 @@
 	var Link = Scroll.Link;
 	var Element = Scroll.Element;
 	
-	var Fake = __webpack_require__(212);
-	
 	var App = React.createClass({
 	  displayName: 'App',
 	  getInitialState: function getInitialState() {
@@ -29181,35 +29179,6 @@
 	
 	module.exports = Helpers.Element(Element);
 
-
-/***/ },
-/* 212 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	var React = __webpack_require__(1);
-	
-	var Fake = React.createClass({
-	  displayName: "Fake",
-	  componentDidMount: function componentDidMount() {
-	    if (this.props.channel === "game") {
-	      console.log(this.props.channel + " is adding listener");
-	    }
-	  },
-	  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
-	    if (nextProps.active) {
-	      console.log(this.props.channel + " is adding listener");
-	    } else {
-	      console.log(this.props.channel + " is removing listener");
-	    }
-	  },
-	  render: function render() {
-	    return React.createElement("div", { className: "fake-box", id: this.props.channel });
-	  }
-	});
-	
-	module.exports = Fake;
 
 /***/ }
 /******/ ]);

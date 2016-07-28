@@ -6,8 +6,6 @@ const Scroll = require('react-scroll');
 const Link = Scroll.Link;
 const Element = Scroll.Element;
 
-const Fake = require('./components/fake');
-
 const App = React.createClass({
   getInitialState() {
     return ({level: 1, game: true, solvable: false, unsolvable: false})

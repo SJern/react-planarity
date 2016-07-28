@@ -8,12 +8,6 @@
     color: #fff !important;
 }
 
-.fake-box {
-  height: 600px;
-  width: 900px;
-  background-color: blue;
-}
-
 .element {
   height: 100vh;
   background-color: #ededed;
