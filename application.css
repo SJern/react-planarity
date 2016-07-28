@@ -1,0 +1,35 @@
+.body {
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+.active {
+    background-color: #000 !important;
+    color: #fff !important;
+}
+
+.fake-box {
+  height: 600px;
+  width: 900px;
+  background-color: blue;
+}
+
+.element {
+  height: 100vh;
+  background-color: #ededed;
+  font-size: 2vw;
+  border-top: 1px solid #000;
+  padding-top: 55px;
+  padding-left: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: scroll;
+}
+
+#game {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+}
