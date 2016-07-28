@@ -64,7 +64,7 @@ const App = React.createClass({
         </Element>
 
         <Element name="unsolvable" className="element">
-          <Fake channel="unsolvable" active={this.state.unsolvable}/>
+          <Graph channel="unsolvable" active={this.state.unsolvable} level={-1} />
         </Element>
 
         <Element name="solvable" className="element">

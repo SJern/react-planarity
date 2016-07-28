@@ -6,6 +6,27 @@ const Edge = require('./edge');
 
 const VertexActions = require('../actions/vertex_actions');
 
+const k33Vertices = [
+  {index: 1, x: 225, y: 200},
+  {index: 2, x: 450, y: 200},
+  {index: 3, x: 675, y: 200},
+  {index: 4, x: 225, y: 400},
+  {index: 5, x: 450, y: 400},
+  {index: 6, x: 675, y: 400}
+];
+
+const k33Pairs = [
+  [k33Vertices[0], k33Vertices[3]],
+  [k33Vertices[0], k33Vertices[4]],
+  [k33Vertices[0], k33Vertices[5]],
+  [k33Vertices[1], k33Vertices[3]],
+  [k33Vertices[1], k33Vertices[4]],
+  [k33Vertices[1], k33Vertices[5]],
+  [k33Vertices[2], k33Vertices[3]],
+  [k33Vertices[2], k33Vertices[4]],
+  [k33Vertices[2], k33Vertices[5]]
+];
+
 function makeRandomVertices(num) {
   const vertices = [];
   const angles = [];
@@ -96,23 +117,27 @@ function verticesAndPairs(vertices, numberOfVerticesToRemove) {
   const desiredVertices = vertices.filter((vertex, i) => {
     return !unwantedsLibrary[i + 1];
   });
-
   return [pairs, desiredVertices];
 }
 
 const Graph = React.createClass({
   getInitialState() {
-    const desiredNumber = this.props.level + 5;
-    let k = 4;
-    while (true) {
-      if (k * (k - 1) >= 2 * desiredNumber) break;
-      k++;
+    let desiredVerticesAndPairs;
+    if (this.props.level === -1) {
+      desiredVerticesAndPairs = [k33Pairs, k33Vertices];
+    } else {
+      const desiredNumber = this.props.level + 5;
+      let k = 4;
+      while (true) {
+        if (k * (k - 1) >= 2 * desiredNumber) break;
+        k++;
+      }
+      const n = k,
+            numberOfVerticesForN = n*(n - 1)/2,
+            vertices = makeRandomVertices(numberOfVerticesForN),
+            numberOfVerticesToRemove = (numberOfVerticesForN - desiredNumber);
+      desiredVerticesAndPairs = verticesAndPairs(vertices, numberOfVerticesToRemove);
     }
-    const n = k,
-          numberOfVerticesForN = n*(n - 1)/2,
-          vertices = makeRandomVertices(numberOfVerticesForN),
-          numberOfVerticesToRemove = (numberOfVerticesForN - desiredNumber),
-          desiredVerticesAndPairs = verticesAndPairs(vertices, numberOfVerticesToRemove);
     return {
       vertices: desiredVerticesAndPairs[1],
       pairs: desiredVerticesAndPairs[0]

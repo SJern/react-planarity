@@ -150,7 +150,7 @@
 	      React.createElement(
 	        Element,
 	        { name: 'unsolvable', className: 'element' },
-	        React.createElement(Fake, { channel: 'unsolvable', active: this.state.unsolvable })
+	        React.createElement(Graph, { channel: 'unsolvable', active: this.state.unsolvable, level: -1 })
 	      ),
 	      React.createElement(
 	        Element,
@@ -21211,6 +21211,10 @@
 	
 	var VertexActions = __webpack_require__(174);
 	
+	var k33Vertices = [{ index: 1, x: 225, y: 200 }, { index: 2, x: 450, y: 200 }, { index: 3, x: 675, y: 200 }, { index: 4, x: 225, y: 400 }, { index: 5, x: 450, y: 400 }, { index: 6, x: 675, y: 400 }];
+	
+	var k33Pairs = [[k33Vertices[0], k33Vertices[3]], [k33Vertices[0], k33Vertices[4]], [k33Vertices[0], k33Vertices[5]], [k33Vertices[1], k33Vertices[3]], [k33Vertices[1], k33Vertices[4]], [k33Vertices[1], k33Vertices[5]], [k33Vertices[2], k33Vertices[3]], [k33Vertices[2], k33Vertices[4]], [k33Vertices[2], k33Vertices[5]]];
+	
 	function makeRandomVertices(num) {
 	  var vertices = [];
 	  var angles = [];
@@ -21314,24 +21318,28 @@
 	  var desiredVertices = vertices.filter(function (vertex, i) {
 	    return !unwantedsLibrary[i + 1];
 	  });
-	
 	  return [pairs, desiredVertices];
 	}
 	
 	var Graph = React.createClass({
 	  displayName: 'Graph',
 	  getInitialState: function getInitialState() {
-	    var desiredNumber = this.props.level + 5;
-	    var k = 4;
-	    while (true) {
-	      if (k * (k - 1) >= 2 * desiredNumber) break;
-	      k++;
+	    var desiredVerticesAndPairs = void 0;
+	    if (this.props.level === -1) {
+	      desiredVerticesAndPairs = [k33Pairs, k33Vertices];
+	    } else {
+	      var desiredNumber = this.props.level + 5;
+	      var k = 4;
+	      while (true) {
+	        if (k * (k - 1) >= 2 * desiredNumber) break;
+	        k++;
+	      }
+	      var n = k,
+	          numberOfVerticesForN = n * (n - 1) / 2,
+	          vertices = makeRandomVertices(numberOfVerticesForN),
+	          numberOfVerticesToRemove = numberOfVerticesForN - desiredNumber;
+	      desiredVerticesAndPairs = verticesAndPairs(vertices, numberOfVerticesToRemove);
 	    }
-	    var n = k,
-	        numberOfVerticesForN = n * (n - 1) / 2,
-	        vertices = makeRandomVertices(numberOfVerticesForN),
-	        numberOfVerticesToRemove = numberOfVerticesForN - desiredNumber,
-	        desiredVerticesAndPairs = verticesAndPairs(vertices, numberOfVerticesToRemove);
 	    return {
 	      vertices: desiredVerticesAndPairs[1],
 	      pairs: desiredVerticesAndPairs[0]
@@ -21940,7 +21948,9 @@
 	VertexStore.pairs = function (channel) {
 	  if (channel === "game") {
 	    return _pairs;
-	  } else if (channel === "solvable") {
+	  } else if (channel === "unsolvable") {
+	    return _unsolvable;
+	  } else {
 	    return _solvable;
 	  }
 	};
@@ -21950,7 +21960,9 @@
 	  var pairs = void 0;
 	  if (vertex.channel === "game") {
 	    pairs = _pairs;
-	  } else if (vertex.channel === "solvable") {
+	  } else if (vertex.channel === "unsolvable") {
+	    pairs = _unsolvable;
+	  } else {
 	    pairs = _solvable;
 	  }
 	  for (var i = 0, len = pairs.length; i < len; i++) {
@@ -21966,7 +21978,9 @@
 	function storePairs(channel, pairs) {
 	  if (channel === "game") {
 	    _pairs = pairs;
-	  } else if (channel === "solvable") {
+	  } else if (channel === "unsolvable") {
+	    _unsolvable = pairs;
+	  } else {
 	    _solvable = pairs;
 	  }
 	}

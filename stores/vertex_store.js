@@ -12,7 +12,9 @@ VertexStore.vertex = function() {
 VertexStore.pairs = function(channel) {
   if (channel === "game") {
     return _pairs;
-  } else if (channel === "solvable") {
+  } else if (channel === "unsolvable") {
+    return _unsolvable;
+  } else {
     return _solvable;
   }
 };
@@ -22,7 +24,9 @@ function updateVertex(vertex) {
   let pairs;
   if (vertex.channel === "game") {
     pairs = _pairs;
-  } else if (vertex.channel === "solvable") {
+  } else if (vertex.channel === "unsolvable") {
+    pairs = _unsolvable;
+  } else {
     pairs = _solvable;
   }
   for (let i = 0, len = pairs.length; i < len; i++) {
@@ -38,7 +42,9 @@ function updateVertex(vertex) {
 function storePairs(channel, pairs) {
   if (channel === "game") {
     _pairs = pairs;
-  } else if (channel === "solvable") {
+  } else if (channel === "unsolvable") {
+    _unsolvable = pairs;
+  } else {
     _solvable = pairs;
   }
 }
