@@ -46,7 +46,7 @@ const App = React.createClass({
                 <li><Link activeClass="active" to="game" spy={true} smooth={true} duration={500}>Planarity.react</Link></li>
                 <li><Link activeClass="active" to="unsolvable" spy={true} smooth={true} duration={500}>Unsolvable</Link></li>
                 <li><Link activeClass="active" to="solvable" spy={true} smooth={true} duration={500}>Solvable</Link></li>
-                <li><a className="github" href="https://github.com/SJern" target="_blank"><GoMarkGithub/> Steven Cheong 2016</a></li>
+                <li><a className="github" href="https://github.com/SJern/react-planarity" target="_blank"><GoMarkGithub/> Steven Cheong 2016</a></li>
               </ul>
           </div>
         </nav>
