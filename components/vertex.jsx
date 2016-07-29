@@ -66,7 +66,7 @@ const Vertex = React.createClass({
   },
 
   render() {
-    return (<circle onMouseDown={this.onMouseDown} cx={this.state.pos.x} cy={this.state.pos.y} r="15" fill="#0cf" stroke="black" />);
+    return (<circle className="vertex" onMouseDown={this.onMouseDown} cx={this.state.pos.x} cy={this.state.pos.y} r="15" fill="#0cf" stroke="black" />);
   }
 });
 

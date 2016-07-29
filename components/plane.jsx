@@ -2,7 +2,7 @@ const React = require('react');
 
 const Plane = React.createClass({
   render: function() {
-    return (<svg {...this.props}>{this.props.children}</svg>);
+    return (<div className="game"><svg {...this.props}>{this.props.children}</svg></div>);
   }
 });
 

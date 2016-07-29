@@ -11,7 +11,7 @@
 .element {
   height: 100vh;
   background-color: #ededed;
-  font-size: 2vw;
+  font-size: 1.5vw;
   border-top: 1px solid #000;
   padding-top: 55px;
   padding-left: 10px;
@@ -26,4 +26,31 @@
   justify-content: space-around;
   align-items: center;
   width: 100%;
+}
+
+.fun-facts {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	width: 100%;
+}
+
+.directions {
+	flex: 1.5;
+}
+
+.game {
+	flex: 2;
+}
+
+.github {
+	color: #333 !important;
+}
+
+li {
+	cursor: pointer;
+}
+
+.vertex {
+	cursor: move;
 }

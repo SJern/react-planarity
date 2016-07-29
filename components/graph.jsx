@@ -146,8 +146,6 @@ const Graph = React.createClass({
 
   componentDidMount() {
     VertexActions.storePairs(this.props.channel, this.state.pairs);
-    const notDone = $('#game .intersected').length;
-    $("#count p").replaceWith(`<p>${notDone} line crossing(s) detected.${notDone ? "" : "<br/>Good job!"}</p>`);
   },
 
   render: function() {
