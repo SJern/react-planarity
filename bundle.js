@@ -131,7 +131,7 @@
 	              null,
 	              React.createElement(
 	                'a',
-	                { className: 'github', href: 'https://github.com/SJern', target: '_blank' },
+	                { className: 'github', href: 'https://github.com/SJern/react-planarity', target: '_blank' },
 	                React.createElement(_markGithub2.default, null),
 	                ' Steven Cheong 2016'
 	              )
