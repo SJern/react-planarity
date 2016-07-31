@@ -154,7 +154,7 @@
 	              React.createElement(
 	                'p',
 	                null,
-	                'A graph is planar if it can be drawn in a plane without edges crossing. Go ahead and geek it out. Solve these puzzles by eliminating any crossing of edges.'
+	                'A graph is planar if it can be drawn in a plane without edges crossing. Go ahead and geek out. Solve these puzzles by eliminating any crossing of edges.'
 	              )
 	            ),
 	            React.createElement(
