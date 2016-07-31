@@ -55,7 +55,7 @@ const App = React.createClass({
           <div id="game">
             <div className="directions">
               <div id="count">
-                <p>A graph is planar if it can be drawn in a plane without edges crossing. Go ahead and geek it out. Solve these puzzles by eliminating any crossing of edges.</p>
+                <p>A graph is planar if it can be drawn in a plane without edges crossing. Go ahead and geek out. Solve these puzzles by eliminating any crossing of edges.</p>
               </div>
               <form onSubmit={this.handleSubmit}>
                 <input type="submit" className="btn btn-primary btn-xs" value="Generate Level:"/>
