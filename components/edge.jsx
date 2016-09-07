@@ -1,24 +1,24 @@
 const React = require('react');
 const VertexStore = require('../stores/vertex_store');
 
-function intersects(p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y) {
-  if ((p0_x === p2_x && p0_y === p2_y) || (p0_x === p3_x && p0_y === p3_y)) {
+function intersects(p0X, p0Y, p1X, p1Y, p2X, p2Y, p3X, p3Y) {
+  if ((p0X === p2X && p0Y === p2Y) || (p0X === p3X && p0Y === p3Y)) {
     return false;
-  } else if ((p1_x === p2_x && p1_y === p2_y) || (p1_x === p3_x && p1_y === p3_y)) {
+  } else if ((p1X === p2X && p1Y === p2Y) || (p1X === p3X && p1Y === p3Y)) {
     return false;
   }
 
-  let s1_x, s1_y, s2_x, s2_y;
-  s1_x = p1_x - p0_x;
-  s1_y = p1_y - p0_y;
-  s2_x = p3_x - p2_x;
-  s2_y = p3_y - p2_y;
+  let s1X, s1Y, s2X, s2Y;
+  s1X = p1X - p0X;
+  s1Y = p1Y - p0Y;
+  s2X = p3X - p2X;
+  s2Y = p3Y - p2Y;
 
-  let s, t;
-  s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y);
-  t = ( s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y);
+  let u, t;
+  u = (-s1Y * (p0X - p2X) + s1X * (p0Y - p2Y)) / (-s2X * s1Y + s1X * s2Y);
+  t = ( s2X * (p0Y - p2Y) - s2Y * (p0X - p2X)) / (-s2X * s1Y + s1X * s2Y);
 
-  return (s >= 0 && s <= 1 && t >= 0 && t <= 1);
+  return (u >= 0 && u <= 1 && t >= 0 && t <= 1);
 }
 
 const Edge = React.createClass({
